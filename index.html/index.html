@@ -1,69 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Smart Route Optimizer</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet" />
-    <style>
-      #map {
-        height: 85vh;
-        border-radius: 1rem;
-        box-shadow: 0 0 30px #38bdf8;
-      }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Route Optimizer</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #2c3e50, #4ca1af);
+    }
 
-      .glass {
-        backdrop-filter: blur(12px);
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-      }
+    .glass-card {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 20px 30px;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      border-radius: 20px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      color: #fff;
+      z-index: 1000;
+      animation: slideDown 1s ease;
+    }
 
-      .glow-btn {
-        transition: all 0.3s ease;
-      }
+    #map {
+      height: 100vh;
+      width: 100%;
+    }
 
-      .glow-btn:hover {
-        box-shadow: 0 0 15px #38bdf8, 0 0 30px #60a5fa;
-        scale: 1.05;
-      }
-    </style>
-  </head>
+    @keyframes slideDown {
+      from { transform: translate(-50%, -50px); opacity: 0; }
+      to { transform: translate(-50%, 0); opacity: 1; }
+    }
 
-  <body class="bg-gray-950 text-white">
-    <!-- Header -->
-    <header class="text-center py-6 bg-gradient-to-r from-purple-800 via-indigo-700 to-blue-800 shadow-lg">
-      <h1 class="text-4xl font-bold tracking-tight">🧠 Smart Route Optimizer</h1>
-      <p class="text-gray-300 mt-2">Ludhiana ➜ Srinagar • AI-powered optimal routing</p>
-    </header>
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      text-align: center;
+    }
 
-    <!-- Controls -->
-    <div class="absolute top-24 left-1/2 transform -translate-x-1/2 z-50 p-4 rounded-xl glass text-white shadow-md w-11/12 md:w-1/2">
-      <div class="flex flex-col md:flex-row justify-between items-center gap-3">
-        <input
-          id="from"
-          class="w-full md:w-1/2 px-4 py-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-400"
-          value="30.9000,75.8573" />
-        <input
-          id="to"
-          class="w-full md:w-1/2 px-4 py-2 rounded bg-gray-800 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-400"
-          value="34.0837,74.7973" />
-        <button
-          onclick="drawRoute()"
-          class="bg-cyan-500 glow-btn px-6 py-2 rounded font-semibold text-black hover:bg-cyan-600">
-          Optimize Route
-        </button>
-      </div>
-    </div>
+    .badge {
+      background: #1abc9c;
+      padding: 5px 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      margin-top: 5px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
 
-    <!-- Map -->
-    <main class="p-4">
-      <div id="map" class="w-full mx-auto"></div>
-    </main>
+  <div class="glass-card">
+    <h1>Smart Route Optimizer</h1>
+    <div class="badge">Ludhiana ➝ Srinagar | Live Map</div>
+  </div>
 
-    <!-- Scripts -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="assets/script.js"></script>
-  </body>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+</body>
 </html>
