@@ -1,83 +1,61 @@
-let map = L.map('map').setView([28.6139, 77.2090], 5); // Default to India
+let map = L.map('map').setView([28.6139, 77.2090], 6); // Default: Delhi
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-let routeLayer;
+let control;
 
-async function getRoute() {
-  const from = document.getElementById('from').value.trim();
-  const to = document.getElementById('to').value.trim();
+function getRoute() {
+  const from = document.getElementById('from').value;
+  const to = document.getElementById('to').value;
   const mode = document.getElementById('mode').value;
+  const icon = {
+    driving: '🚗', train: '🚆', air: '✈️'
+  }[mode] || '🛣';
 
-  if (!from || !to) {
-    alert("Please enter both locations.");
-    return;
-  }
+  if (control) map.removeControl(control);
 
-  // Icons for transport mode
-  const modeIcons = {
-    driving: "🚗",
-    train: "🚆",
-    air: "✈️"
-  };
+  Promise.all([geocode(from), geocode(to)]).then(([start, end]) => {
+    control = L.Routing.control({
+      waypoints: [L.latLng(start.lat, start.lon), L.latLng(end.lat, end.lon)],
+      createMarker: function (i, wp) {
+        return L.marker(wp.latLng, {
+          icon: L.icon({
+            iconUrl: 'https://maps.google.com/mapfiles/ms/icons/red-dot.png',
+            iconSize: [32, 32],
+            iconAnchor: [16, 32]
+          })
+        });
+      },
+      routeWhileDragging: false,
+      show: false
+    }).addTo(map);
 
-  document.getElementById("modeIcon").innerText = modeIcons[mode] || "🛣";
+    const distance = map.distance(
+      [start.lat, start.lon],
+      [end.lat, end.lon]
+    ) / 1000;
 
-  const fromCoord = await getCoordinates(from);
-  const toCoord = await getCoordinates(to);
+    let duration = 0;
+    if (mode === 'driving') duration = distance / 60 * 60;
+    else if (mode === 'train') duration = distance / 80 * 60;
+    else duration = distance / 600 * 60;
 
-  if (!fromCoord || !toCoord) {
-    alert("Couldn't find one of the locations. Please check the spelling.");
-    return;
-  }
+    document.getElementById('distance').textContent = distance.toFixed(1);
+    document.getElementById('duration').textContent = duration.toFixed(0);
+    document.getElementById('modeIcon').textContent = icon;
+    document.getElementById('resultBox').style.display = 'block';
 
-  // Clear previous route
-  if (routeLayer) {
-    map.removeLayer(routeLayer);
-  }
-
-  // Draw new route
-  routeLayer = L.Routing.control({
-    waypoints: [
-      L.latLng(fromCoord.lat, fromCoord.lon),
-      L.latLng(toCoord.lat, toCoord.lon)
-    ],
-    routeWhileDragging: false,
-    createMarker: function (i, wp, nWps) {
-      return L.marker(wp.latLng, {
-        icon: L.icon({
-          iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
-          iconSize: [40, 40],
-          iconAnchor: [20, 40]
-        })
-      });
-    }
-  }).addTo(map);
-
-  // Fetch and display distance & duration
-  const osrmUrl = `https://router.project-osrm.org/route/v1/driving/${fromCoord.lon},${fromCoord.lat};${toCoord.lon},${toCoord.lat}?overview=false`;
-
-  const res = await fetch(osrmUrl);
-  const data = await res.json();
-
-  if (data.routes && data.routes.length > 0) {
-    const route = data.routes[0];
-    const distanceKm = (route.distance / 1000).toFixed(2);
-    const durationMin = (route.duration / 60).toFixed(1);
-
-    document.getElementById("distance").innerText = distanceKm;
-    document.getElementById("duration").innerText = durationMin;
-    document.getElementById("resultBox").style.display = "block";
-  } else {
-    alert("Route not found.");
-  }
+  }).catch(() => alert('Invalid locations!'));
 }
 
-async function getCoordinates(place) {
+function geocode(place) {
   const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place)}`;
-  const res = await fetch(url);
-  const data = await res.json();
-  return data[0];
+  return fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      if (!data[0]) throw new Error('No location found');
+      return data[0];
+    });
 }

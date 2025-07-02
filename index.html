@@ -5,77 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🚀 Smart Route Optimizer</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
   <style>
-    * {
-      box-sizing: border-box;
-    }
     body {
       margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #0e0e0e, #1a1a1a);
-      color: #f0f0f0;
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(145deg, #0f0c29, #302b63, #24243e);
       overflow: hidden;
+      color: #fff;
     }
 
     header {
       text-align: center;
-      padding: 30px 0 10px;
-      font-size: 2.2rem;
-      font-weight: 700;
-      background: linear-gradient(90deg, #e60000, #ff0080);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: fadeInTop 1s ease;
+      padding: 20px 0 10px;
+      font-size: 2.4rem;
+      color: #ff00cc;
+      text-shadow: 0 0 10px #ff00cc;
+      animation: fadeDown 1.2s ease-in-out;
     }
 
-    @keyframes fadeInTop {
-      from { transform: translateY(-30px); opacity: 0; }
+    @keyframes fadeDown {
+      from { transform: translateY(-50px); opacity: 0; }
       to { transform: translateY(0); opacity: 1; }
-    }
-
-    .glass {
-      position: absolute;
-      top: 100px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.03);
-      backdrop-filter: blur(12px);
-      padding: 20px 30px;
-      border-radius: 16px;
-      box-shadow: 0 0 25px rgba(255, 0, 122, 0.3);
-      display: flex;
-      gap: 15px;
-      align-items: center;
-      animation: fadeIn 1.2s ease;
-      z-index: 1000;
-    }
-
-    input, select {
-      padding: 12px 16px;
-      border-radius: 12px;
-      border: none;
-      background: rgba(255, 255, 255, 0.08);
-      color: #f0f0f0;
-      font-size: 16px;
-      width: 180px;
-    }
-
-    button {
-      padding: 12px 24px;
-      background-color: #ff0055;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 0 20px #ff0055;
-      transition: 0.3s;
-    }
-
-    button:hover {
-      background-color: #e60040;
-      box-shadow: 0 0 35px #ff0080;
     }
 
     #map {
@@ -84,19 +36,70 @@
       z-index: 1;
     }
 
-    .result-box {
+    .glass {
       position: absolute;
-      bottom: 80px;
+      top: 90px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(10px);
-      padding: 16px 24px;
-      border-radius: 14px;
-      color: #ffffff;
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(15px);
+      padding: 20px 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px #ff00cc;
+      z-index: 999;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      animation: fadeUp 1.2s ease-in-out;
+    }
+
+    @keyframes fadeUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    input, select {
+      padding: 12px 15px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      background: rgba(255, 255, 255, 0.12);
+      color: #ff00cc;
+      font-size: 16px;
+      width: 180px;
+    }
+
+    button {
+      padding: 12px 22px;
+      border: none;
+      border-radius: 10px;
+      background-color: #ff00cc;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 0 15px #ff00cc;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #d600a1;
+      box-shadow: 0 0 25px #ff00cc;
+    }
+
+    .result-box {
+      position: absolute;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.6);
+      padding: 15px 25px;
+      border-radius: 15px;
+      color: #ff00cc;
+      box-shadow: 0 0 15px #ff00cc;
       font-size: 18px;
-      box-shadow: 0 0 18px rgba(255, 0, 80, 0.3);
+      z-index: 999;
       display: none;
+      animation: fadeUp 1s ease-in-out;
     }
 
     footer {
@@ -104,48 +107,54 @@
       bottom: 0;
       width: 100%;
       text-align: center;
-      background: #111;
-      padding: 12px;
-      color: #ff0080;
-      font-weight: 500;
+      background-color: rgba(0, 0, 0, 0.75);
+      padding: 10px;
       font-size: 13px;
+      color: #ff00cc;
+      font-weight: 600;
+      letter-spacing: 0.5px;
     }
 
     footer a {
-      color: #ff0080;
+      color: #ff00cc;
       text-decoration: none;
+      transition: 0.3s;
     }
+
     footer a:hover {
-      text-shadow: 0 0 10px #ff0080;
+      color: #fff;
+      text-shadow: 0 0 10px #ff00cc;
     }
   </style>
 </head>
 <body>
+
   <header>🚀 Smart Route Optimizer</header>
 
   <div class="glass">
-    <input type="text" id="from" placeholder="🔍 From (e.g. Bengaluru)">
-    <input type="text" id="to" placeholder="📍 To (e.g. Delhi)">
+    <input type="text" id="from" placeholder="🔍 From (e.g. Ludhiana)">
+    <input type="text" id="to" placeholder="📍 To (e.g. Srinagar)">
     <select id="mode">
-      <option value="driving">🚗 Road</option>
-      <option value="train">🚆 Train</option>
-      <option value="air">✈️ Air</option>
+      <option value="driving">🚗 By Road</option>
+      <option value="train">🚆 By Train</option>
+      <option value="air">✈️ By Air</option>
     </select>
-    <button onclick="getRoute()">🧭 Navigate</button>
+    <button onclick="getRoute()">🧠 Optimize</button>
   </div>
 
   <div id="map"></div>
 
   <div class="result-box" id="resultBox">
     <span id="modeIcon">🛣</span> Distance: <span id="distance"></span> km<br>
-    ⏱ Duration: <span id="duration"></span> mins
+    ⏱ Time: <span id="duration"></span> mins
   </div>
 
   <footer>
-    Created by <a href="https://github.com/ZahikAbasdar" target="_blank">Zahik Abasdar · GitHub</a>
+    Created by <a href="https://github.com/ZahikAbasdar" target="_blank">ZahikAbasdar · GitHub</a>
   </footer>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
