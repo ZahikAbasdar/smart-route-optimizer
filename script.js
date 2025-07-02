@@ -1,74 +1,71 @@
-const map = L.map('map').setView([28.6139, 77.2090], 5); // Default to India center
+let map = L.map('map').setView([28.6139, 77.2090], 5); // Initial center: India
 
-L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-  maxZoom: 19,
-  attribution: '&copy; OpenStreetMap'
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 19
 }).addTo(map);
 
-let routeLayer, fromMarker, toMarker;
+let routeLine, fromMarker, toMarker;
 
 async function getRoute() {
-  const from = document.getElementById("from").value;
-  const to = document.getElementById("to").value;
+  const from = document.getElementById("from").value.trim();
+  const to = document.getElementById("to").value.trim();
   const mode = document.getElementById("mode").value;
-  const resultBox = document.getElementById("resultBox");
 
   if (!from || !to) {
-    alert("Please enter both locations!");
+    alert("Please enter both FROM and TO locations.");
     return;
   }
 
-  try {
-    const [fromData, toData] = await Promise.all([
-      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${from}`).then(res => res.json()),
-      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${to}`).then(res => res.json())
-    ]);
+  const fromCoord = await getCoordinates(from);
+  const toCoord = await getCoordinates(to);
 
-    if (!fromData.length || !toData.length) {
-      alert("Location not found.");
-      return;
-    }
-
-    const fromLatLng = [parseFloat(fromData[0].lat), parseFloat(fromData[0].lon)];
-    const toLatLng = [parseFloat(toData[0].lat), parseFloat(toData[0].lon)];
-
-    if (fromMarker) map.removeLayer(fromMarker);
-    if (toMarker) map.removeLayer(toMarker);
-    if (routeLayer) map.removeLayer(routeLayer);
-
-    fromMarker = L.marker(fromLatLng, { title: "From" }).addTo(map);
-    toMarker = L.marker(toLatLng, { title: "To" }).addTo(map);
-
-    const routeData = await fetch(`https://router.project-osrm.org/route/v1/driving/${fromLatLng[1]},${fromLatLng[0]};${toLatLng[1]},${toLatLng[0]}?overview=full&geometries=geojson`).then(res => res.json());
-
-    const coords = routeData.routes[0].geometry.coordinates.map(coord => [coord[1], coord[0]]);
-    routeLayer = L.polyline(coords, { color: '#00ffd5', weight: 6 }).addTo(map);
-    map.fitBounds(routeLayer.getBounds(), { padding: [80, 80] });
-
-    // Distance & Duration
-    const distance = (routeData.routes[0].distance / 1000).toFixed(2); // in km
-    let duration = (routeData.routes[0].duration / 60).toFixed(0); // in mins
-
-    // Adjust duration based on selected mode
-    switch (mode) {
-      case "air":
-        duration = (distance / 800 * 60).toFixed(0); // Avg plane speed ~800km/h
-        break;
-      case "train":
-        duration = (distance / 70 * 60).toFixed(0); // Avg train speed ~70km/h
-        break;
-      case "road":
-      default:
-        // Already calculated from OSRM
-        break;
-    }
-
-    document.getElementById("distance").textContent = distance;
-    document.getElementById("duration").textContent = duration;
-    resultBox.style.display = "block";
-
-  } catch (error) {
-    console.error("Error fetching route:", error);
-    alert("Something went wrong.");
+  if (!fromCoord || !toCoord) {
+    alert("Could not find coordinates for the entered locations.");
+    return;
   }
+
+  if (routeLine) map.removeLayer(routeLine);
+  if (fromMarker) map.removeLayer(fromMarker);
+  if (toMarker) map.removeLayer(toMarker);
+
+  fromMarker = L.marker(fromCoord, { title: 'From 📍', icon: redIcon }).addTo(map);
+  toMarker = L.marker(toCoord, { title: 'To 📍', icon: redIcon }).addTo(map);
+
+  const routeRes = await fetch(`https://router.project-osrm.org/route/v1/driving/${fromCoord[1]},${fromCoord[0]};${toCoord[1]},${toCoord[0]}?overview=full&geometries=geojson`);
+  const routeData = await routeRes.json();
+
+  const coords = routeData.routes[0].geometry.coordinates.map(c => [c[1], c[0]]);
+  const distance = (routeData.routes[0].distance / 1000).toFixed(2);
+  const duration = Math.round(routeData.routes[0].duration / 60);
+
+  routeLine = L.polyline(coords, { color: '#00ffd5', weight: 5 }).addTo(map);
+  map.fitBounds(routeLine.getBounds());
+
+  const resultBox = document.getElementById("resultBox");
+  document.getElementById("distance").innerText = distance;
+  document.getElementById("duration").innerText = duration;
+
+  let icon = mode === "air" ? "✈️" : mode === "train" ? "🚆" : "🚗";
+  document.getElementById("modeIcon").innerText = icon;
+  resultBox.style.display = "block";
 }
+
+// Geocoding helper using Nominatim API
+async function getCoordinates(location) {
+  const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${location}`);
+  const data = await res.json();
+  if (data && data.length > 0) {
+    return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+  }
+  return null;
+}
+
+// Custom red map icon
+const redIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
