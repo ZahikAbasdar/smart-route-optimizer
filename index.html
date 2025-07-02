@@ -5,87 +5,122 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>🚀 Smart Route Optimizer</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       font-family: 'Orbitron', sans-serif;
-      background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
+      background: linear-gradient(145deg, #000000, #121212);
       color: #fff;
       overflow: hidden;
     }
-    header {
-      text-align: center;
-      padding: 20px;
-      font-size: 28px;
-      background-color: rgba(0, 0, 0, 0.6);
-      text-shadow: 0 0 20px #00fff7;
-    }
+
     #map {
-      height: 85vh;
+      height: 100vh;
       width: 100%;
     }
-    .controls {
+
+    .glass {
       position: absolute;
-      top: 80px;
+      top: 30px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.7);
-      padding: 20px;
-      border-radius: 15px;
-      display: flex;
-      gap: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      padding: 20px 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 25px #00ffd5;
       z-index: 999;
-      box-shadow: 0 0 25px #00fff7;
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      transition: all 0.3s ease-in-out;
     }
-    input, button {
-      padding: 10px;
+    .glass:hover {
+      box-shadow: 0 0 35px #00ffd5;
+    }
+
+    input, select {
+      padding: 12px 15px;
       border-radius: 10px;
       border: none;
-      font-size: 14px;
+      outline: none;
+      background: rgba(255, 255, 255, 0.12);
+      color: #00ffd5;
+      font-size: 16px;
+      width: 200px;
+      transition: box-shadow 0.3s;
     }
-    input {
-      width: 180px;
+    input:focus, select:focus {
+      box-shadow: 0 0 10px #00ffd5;
     }
+
     button {
-      background-color: #00fff7;
+      padding: 12px 22px;
+      border: none;
+      border-radius: 10px;
+      background-color: #00ffd5;
       color: #000;
       font-weight: bold;
       cursor: pointer;
+      box-shadow: 0 0 15px #00ffd5;
+      transition: 0.3s;
     }
+    button:hover {
+      background-color: #00bfa6;
+      box-shadow: 0 0 25px #00ffd5;
+      transform: scale(1.05);
+    }
+
     .result-box {
       position: absolute;
       bottom: 70px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.8);
-      padding: 10px 25px;
-      border-radius: 10px;
-      color: #00fff7;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 15px 25px;
+      border-radius: 15px;
+      color: #00ffd5;
+      box-shadow: 0 0 15px #00ffd5;
+      font-size: 18px;
       z-index: 999;
       display: none;
-      box-shadow: 0 0 10px #00fff7;
     }
+
     footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
       text-align: center;
-      background-color: #111;
-      color: #00fff7;
+      background-color: rgba(0, 0, 0, 0.75);
+      padding: 10px;
       font-size: 13px;
-      padding: 8px;
+      color: #00ffd5;
+      font-weight: 600;
+      letter-spacing: 0.5px;
     }
+
     footer a {
-      color: #00fff7;
+      color: #00ffd5;
       text-decoration: none;
+      transition: 0.3s;
+    }
+    footer a:hover {
+      color: #fff;
+      text-shadow: 0 0 10px #00ffd5;
     }
   </style>
 </head>
 <body>
-  <header>🚀 Smart Route Optimizer</header>
-
-  <div class="controls">
+  <div class="glass">
     <input type="text" id="from" placeholder="🔍 From (e.g. Ludhiana)">
     <input type="text" id="to" placeholder="📍 To (e.g. Srinagar)">
-    <button onclick="getRoute()">Optimize</button>
+    <select id="mode">
+      <option value="road">🚗 Road</option>
+      <option value="train">🚆 Train</option>
+      <option value="air">✈️ Air</option>
+    </select>
+    <button onclick="getRoute()">🧠 Optimize</button>
   </div>
 
   <div id="map"></div>
@@ -95,7 +130,9 @@
     ⏱ Time: <span id="duration"></span> mins
   </div>
 
-  <footer>Created by <a href="https://github.com/ZahikAbasdar" target="_blank">ZahikAbasdar · GitHub</a></footer>
+  <footer>
+    Created by <a href="https://github.com/ZahikAbasdar" target="_blank">ZahikAbasdar · GitHub</a>
+  </footer>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="script.js"></script>
