@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🚀 Smart Route Optimizer</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364);
+      color: #fff;
+      overflow: hidden;
+    }
+    header {
+      text-align: center;
+      padding: 20px;
+      font-size: 28px;
+      background-color: rgba(0, 0, 0, 0.6);
+      text-shadow: 0 0 20px #00fff7;
+    }
+    #map {
+      height: 85vh;
+      width: 100%;
+    }
+    .controls {
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      border-radius: 15px;
+      display: flex;
+      gap: 10px;
+      z-index: 999;
+      box-shadow: 0 0 25px #00fff7;
+    }
+    input, button {
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      font-size: 14px;
+    }
+    input {
+      width: 180px;
+    }
+    button {
+      background-color: #00fff7;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .result-box {
+      position: absolute;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.8);
+      padding: 10px 25px;
+      border-radius: 10px;
+      color: #00fff7;
+      z-index: 999;
+      display: none;
+      box-shadow: 0 0 10px #00fff7;
+    }
+    footer {
+      text-align: center;
+      background-color: #111;
+      color: #00fff7;
+      font-size: 13px;
+      padding: 8px;
+    }
+    footer a {
+      color: #00fff7;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <header>🚀 Smart Route Optimizer</header>
+
+  <div class="controls">
+    <input type="text" id="from" placeholder="🔍 From (e.g. Ludhiana)">
+    <input type="text" id="to" placeholder="📍 To (e.g. Srinagar)">
+    <button onclick="getRoute()">Optimize</button>
+  </div>
+
+  <div id="map"></div>
+
+  <div class="result-box" id="resultBox">
+    🛣 Distance: <span id="distance"></span> km<br>
+    ⏱ Time: <span id="duration"></span> mins
+  </div>
+
+  <footer>Created by <a href="https://github.com/ZahikAbasdar" target="_blank">ZahikAbasdar · GitHub</a></footer>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
