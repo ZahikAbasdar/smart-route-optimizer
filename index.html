@@ -11,18 +11,33 @@
       margin: 0;
       font-family: 'Orbitron', sans-serif;
       background: linear-gradient(145deg, #000000, #121212);
-      color: #fff;
       overflow: hidden;
+      color: #fff;
+    }
+
+    header {
+      text-align: center;
+      padding: 20px 0 10px;
+      font-size: 2.4rem;
+      color: #00ffd5;
+      text-shadow: 0 0 10px #00ffd5;
+      animation: fadeDown 1.2s ease-in-out;
+    }
+
+    @keyframes fadeDown {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
     #map {
       height: 100vh;
       width: 100%;
+      z-index: 1;
     }
 
     .glass {
       position: absolute;
-      top: 30px;
+      top: 90px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(255, 255, 255, 0.05);
@@ -34,10 +49,12 @@
       display: flex;
       gap: 15px;
       align-items: center;
-      transition: all 0.3s ease-in-out;
+      animation: fadeUp 1.2s ease-in-out;
     }
-    .glass:hover {
-      box-shadow: 0 0 35px #00ffd5;
+
+    @keyframes fadeUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
 
     input, select {
@@ -48,11 +65,7 @@
       background: rgba(255, 255, 255, 0.12);
       color: #00ffd5;
       font-size: 16px;
-      width: 200px;
-      transition: box-shadow 0.3s;
-    }
-    input:focus, select:focus {
-      box-shadow: 0 0 10px #00ffd5;
+      width: 180px;
     }
 
     button {
@@ -66,10 +79,10 @@
       box-shadow: 0 0 15px #00ffd5;
       transition: 0.3s;
     }
+
     button:hover {
       background-color: #00bfa6;
       box-shadow: 0 0 25px #00ffd5;
-      transform: scale(1.05);
     }
 
     .result-box {
@@ -85,6 +98,7 @@
       font-size: 18px;
       z-index: 999;
       display: none;
+      animation: fadeUp 1s ease-in-out;
     }
 
     footer {
@@ -105,6 +119,7 @@
       text-decoration: none;
       transition: 0.3s;
     }
+
     footer a:hover {
       color: #fff;
       text-shadow: 0 0 10px #00ffd5;
@@ -112,13 +127,16 @@
   </style>
 </head>
 <body>
+
+  <header>🚀 Smart Route Optimizer</header>
+
   <div class="glass">
     <input type="text" id="from" placeholder="🔍 From (e.g. Ludhiana)">
     <input type="text" id="to" placeholder="📍 To (e.g. Srinagar)">
     <select id="mode">
-      <option value="road">🚗 Road</option>
-      <option value="train">🚆 Train</option>
-      <option value="air">✈️ Air</option>
+      <option value="driving">🚗 By Road</option>
+      <option value="train">🚆 By Train</option>
+      <option value="air">✈️ By Air</option>
     </select>
     <button onclick="getRoute()">🧠 Optimize</button>
   </div>
@@ -126,7 +144,7 @@
   <div id="map"></div>
 
   <div class="result-box" id="resultBox">
-    🛣 Distance: <span id="distance"></span> km<br>
+    <span id="modeIcon">🛣</span> Distance: <span id="distance"></span> km<br>
     ⏱ Time: <span id="duration"></span> mins
   </div>
 
